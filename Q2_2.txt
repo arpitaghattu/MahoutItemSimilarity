@@ -1,0 +1,61 @@
+val uID = "20"
+
+val rData = sc.textFile("/arg130330/ratings.dat")
+
+val rArray = rData.toArray
+
+val rList = new scala.collection.mutable.MutableList[String]
+
+for(i <- 0 until rArray.length){
+	val rLine = rArray(i).split("::")
+	if(rLine(0) == uID && rLine(2) == "3") {
+		rList += rLine(1)
+	}
+}
+print(rList)
+
+val sMatrix = sc.textFile("/arg130330/outputMatrix/indicator-matrix")
+
+val sArray = sMatrix.toArray
+
+val sMap = new scala.collection.mutable.HashMap[String,scala.collection.mutable.MutableList[String]]
+
+for(i <- 0 until sArray.length){
+	val sLine = sArray(i).split("\\s+")
+	val sKey = sLine(0)
+		if(rList.contains(sKey)){
+			if(sLine.length > 1){
+				val mList = new scala.collection.mutable.MutableList[String]
+				for( j <- 1 until sLine.length){
+					val mSeparator = sLine(j).split(":")
+					val mID = mSeparator(0)
+					mList += mID
+				}
+				sMap(sKey) = mList
+			       
+			}
+	}
+}
+print(sMap)
+
+val mlst = sc.textFile("/arg130330/movies.dat")
+val mMap = new scala.collection.mutable.HashMap[String,String]
+val mArray=mlst.toArray
+for(i <- 0 until mArray.length){
+	val mLine = mArray(i).split("::")
+	mMap(mLine(0)) = mLine(1)
+}
+
+print(mMap)
+
+for(i <- 0 until rList.length){
+	val movlst = rList(i)
+	if(sMap.contains(movlst)){
+		println("")
+		print(movlst+":"+mMap(movlst)+" ")
+		for(i <- 0 until sMap(movlst).length){
+			print(sMap(movlst)(i)+":"+mMap(sMap(movlst)(i)) + ",")
+		}
+		println("")
+	}
+}
